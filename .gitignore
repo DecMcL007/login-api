@@ -1,0 +1,22 @@
+# Build
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# IntelliJ / IDEA
+.idea/
+*.iml
+out/
+
+# OS cruft
+.DS_Store
+
+# Logs
+*.log
+
+# Local-only configs (if you ever create them)
+application-local.properties
+application-*.yml
+
+# Keys / certs (never commit)
+*.pem
+*.key
