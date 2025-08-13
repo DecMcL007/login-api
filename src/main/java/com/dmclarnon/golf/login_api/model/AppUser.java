@@ -27,4 +27,7 @@ public class AppUser {
 
     @Column(nullable = false)
     private boolean enabled = true;
+
+    @Column(nullable = false)
+    private double handicap;
 }
