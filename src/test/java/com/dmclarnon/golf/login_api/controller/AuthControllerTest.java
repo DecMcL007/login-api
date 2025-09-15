@@ -22,7 +22,7 @@ class AuthControllerTest {
     @Test
     void registerReturnsBearerToken() {
         // arrange
-        RegisterRequest req = new RegisterRequest("testuser", "pw123", "pw123");
+        RegisterRequest req = new RegisterRequest("testuser", "pw123", "pw123", "pw123");
         AppUser fakeUser = new AppUser();
         fakeUser.setUsername("testuser");
         fakeUser.setRole("USER");
