@@ -14,13 +14,17 @@ public class UserService {
     private final PasswordEncoder encoder;
 
     public AppUser register(RegisterRequest req) {
-        if (user.existsByUsername(req.username())) throw new IllegalArgumentException("username taken!");
-        if (user.existsByEmail(req.email())) throw new IllegalArgumentException("email taken !");
+        if (user.existsByUsername(req.username())) {
+            throw new IllegalArgumentException("username taken!");
+        }
+        if (user.existsByEmail(req.email())) {
+            throw new IllegalArgumentException("email taken !");
+        }
 
         AppUser u = AppUser.builder()
                 .username(req.username())
                 .email(req.email())
-                .passwordHash(encoder.encode(req.password()))
+                .passwordHash(encoder.encode(req.password1()))
                 .role("USER")
                 .enabled(true)
                 .build();
