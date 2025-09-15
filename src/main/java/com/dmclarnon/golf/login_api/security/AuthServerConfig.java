@@ -36,8 +36,11 @@ public class AuthServerConfig {
         var endpoints = asConfigurer.getEndpointsMatcher(); // matches /oauth2/** and /.well-known/**
 
         http
-                .securityMatcher(endpoints)
-                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+                .securityMatcher("/oauth2/**", "/.well-known/**")
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/oauth2/jwks", "/.well-known/openid-configuration").permitAll()
+                        .anyRequest().authenticated()
+                )
                 .csrf(csrf -> csrf.ignoringRequestMatchers(endpoints))
                 // replace deprecated .apply(...) with the new style:
                 .with(asConfigurer, as -> as.oidc(Customizer.withDefaults()))
@@ -57,8 +60,11 @@ public class AuthServerConfig {
                         .requestMatchers("/auth/register", "/auth/login").permitAll()
                         .anyRequest().authenticated()
                 )
-                .formLogin(Customizer.withDefaults());  //login page for testing
-         return http.build();
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults())) // 🔑 enable JWT auth
+                .formLogin(form -> form.disable())
+                .httpBasic(basic -> basic.disable());
+
+        return http.build();
     }
 
     // ---------- 3) Client (who can request tokens)
