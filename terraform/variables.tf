@@ -12,11 +12,6 @@ variable "alb_public_subnets" {
   default = ["subnet-0439022c27130a7eb", "subnet-0920b789870a4cdd0"]
 }
 
-variable "service_security_group_id" {
-  type = string
-  # example: "sg-094d40a41b39d90be"
-}
-
 # The ECS service (login-api) can reuse the same for now — public Fargate deployment
 variable "service_subnets" {
   type    = list(string)
