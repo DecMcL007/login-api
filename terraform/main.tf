@@ -34,6 +34,10 @@ resource "aws_security_group" "alb_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  lifecycle {
+    ignore_changes = [name]
+  }
 }
 
 data "aws_vpc" "selected" {
@@ -63,6 +67,10 @@ resource "aws_lb_target_group" "login_api" {
     interval          = 30
     timeout           = 5
     healthy_threshold = 2
+  }
+
+  lifecycle {
+    prevent_destroy = true
   }
 }
 
@@ -99,19 +107,22 @@ data "aws_iam_policy_document" "ecs_assume" {
   }
 }
 
+
 resource "aws_iam_role" "exec_role" {
-  name               = "login-api-exec-role"
+  name_prefix        = "login-api-exec-"
   assume_role_policy = data.aws_iam_policy_document.ecs_assume.json
 }
+
+resource "aws_iam_role" "task_role" {
+  name_prefix        = "login-api-task-"
+  assume_role_policy = data.aws_iam_policy_document.ecs_assume.json
+}
+
 resource "aws_iam_role_policy_attachment" "exec_attach" {
   role       = aws_iam_role.exec_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-resource "aws_iam_role" "task_role" {
-  name               = "login-api-task-role"
-  assume_role_policy = data.aws_iam_policy_document.ecs_assume.json
-}
 
 # Task definition
 resource "aws_ecs_task_definition" "login_api" {
