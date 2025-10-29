@@ -88,13 +88,6 @@ resource "aws_cloudwatch_log_group" "login_api" {
   }
 }
 
-
-# Log group
-resource "aws_cloudwatch_log_group" "login_api" {
-  name              = "/ecs/login-api-task"
-  retention_in_days = 14
-}
-
 # IAM roles for ECS tasks
 data "aws_iam_policy_document" "ecs_assume" {
   statement {
