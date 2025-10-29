@@ -36,12 +36,8 @@ resource "aws_security_group" "alb_sg" {
   }
 }
 
-# Look up the VPC ID automatically from one of your subnets
-data "aws_subnet" "first" {
-  id = var.alb_public_subnets[0]
-}
 data "aws_vpc" "selected" {
-  id = data.aws_subnet.first.vpc_id
+  id = "vpc-042a30daa4cc5bcdb"
 }
 
 # ALB
