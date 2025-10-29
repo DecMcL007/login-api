@@ -78,6 +78,17 @@ resource "aws_lb_listener" "http" {
   }
 }
 
+
+resource "aws_cloudwatch_log_group" "login_api" {
+  name              = "/ecs/login-api-task"
+  retention_in_days = 14
+
+  lifecycle {
+    ignore_changes = [name]
+  }
+}
+
+
 # Log group
 resource "aws_cloudwatch_log_group" "login_api" {
   name              = "/ecs/login-api-task"
