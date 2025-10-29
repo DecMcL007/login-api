@@ -1,20 +1,18 @@
-name: Build and Push Login API to ECR
+name: Build & Deploy Login API
 
 on:
   push:
     branches: [ main, dev ]
 
+permissions:
+  contents: read
+  id-token: write   # for OIDC authentication
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      id-token: write  # needed for OIDC (no AWS secrets required)
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -32,7 +30,31 @@ jobs:
           ECR_REPOSITORY: golf/login-api
           IMAGE_TAG: ${{ github.run_number }}
         run: |
-          echo "Building image: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          echo "Building: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_ENV
+          echo "IMAGE_URI=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_ENV
+
+  terraform-apply:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::085610382073:role/github-actions-deploy-role
+          aws-region: eu-west-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init & Apply
+        working-directory: terraform
+        env:
+          TF_VAR_image_uri: ${{ env.IMAGE_URI }}
+          TF_VAR_service_security_group_id: "sg-094d40a41b39d90be"
+        run: |
+          terraform init -input=false
+          terraform apply -auto-approve -input=false
