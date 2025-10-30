@@ -74,14 +74,31 @@ locals {
 }
 
 ##########################################
-# Load Balancer
+# Load Balancer (reuse or create)
 ##########################################
+
+#Try to find an existing ALB by name
+data "aws_lb" "existing" {
+  name = "login-api-alb"
+}
+
+#Create a new one only if the lookup fails
 resource "aws_lb" "this" {
+  count              = can(data.aws_lb.existing.arn) ? 0 : 1
   name               = "login-api-alb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [local.alb_sg_id]
   subnets            = var.alb_public_subnets
+}
+
+#Local variable to use the right ARN in downstream references
+locals {
+  alb_arn = (
+    can(data.aws_lb.existing.arn)
+    ? data.aws_lb.existing.arn
+    : aws_lb.this[0].arn
+  )
 }
 
 ##########################################
@@ -123,7 +140,7 @@ locals {
 # ALB Listener
 ##########################################
 resource "aws_lb_listener" "http" {
-  load_balancer_arn = aws_lb.this.arn
+  load_balancer_arn = local.alb_arn
   port              = 80
   protocol          = "HTTP"
 
