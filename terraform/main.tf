@@ -221,10 +221,10 @@ resource "aws_ecs_task_definition" "login_api" {
       image     = var.image_uri
       essential = true
       portMappings = [
-        {
-          containerPort = var.container_port
-          protocol      = "tcp"
-        }
+  {
+    containerPort = 8080
+    protocol      = "tcp"
+  }
       ]
       logConfiguration = {
         logDriver = "awslogs"
@@ -236,7 +236,7 @@ resource "aws_ecs_task_definition" "login_api" {
       }
       environment = [
         { name = "SPRING_PROFILES_ACTIVE", value = "ecs" },
-        { name = "SERVER_PORT", value = tostring(var.container_port) }
+        { name = "SERVER_PORT", value = "8080" }
       ]
     }
   ])
