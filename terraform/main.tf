@@ -1,4 +1,10 @@
 terraform {
+      backend "s3" {
+        bucket         = "golf-terraform-state"
+        key            = "login-api/terraform.tfstate"
+        region         = "eu-west-1"
+        dynamodb_table = "terraform-locks"
+      }
   required_providers {
     aws = {
       source  = "hashicorp/aws"
