@@ -261,7 +261,7 @@ resource "aws_ecs_service" "login_api" {
   load_balancer {
     target_group_arn = local.target_group_arn
     container_name   = "login-api"
-    container_port   = var.container_port
+    container_port   = 8080
   }
 
   depends_on = [aws_lb_listener.http]
