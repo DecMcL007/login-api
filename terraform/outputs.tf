@@ -3,8 +3,10 @@
 ##########################################
 
 output "alb_dns_name" {
-  description = "DNS name of the Application Load Balancer"
-  value       = aws_lb.this.dns_name
+  description = "The DNS name of the ALB"
+  value       = can(data.aws_lb.existing.dns_name)
+    ? data.aws_lb.existing.dns_name
+    : aws_lb.this[0].dns_name
 }
 
 output "alb_security_group_id" {
