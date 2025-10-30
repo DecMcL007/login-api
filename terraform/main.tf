@@ -264,5 +264,9 @@ resource "aws_ecs_service" "login_api" {
     container_port   = 8080
   }
 
+    lifecycle {
+      ignore_changes = [task_definition, desired_count]
+    }
+
   depends_on = [aws_lb_listener.http]
 }
